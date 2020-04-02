@@ -1,0 +1,64 @@
+# Used on master and staging branches
+name: Production CI
+
+on:
+  push:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - "feature/test-release" # Push events on all branchs
+
+jobs:
+  test:
+    name: Test, Build & Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        node-version: [12]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Semantic Release
+        id: semantic_release
+        run: npx semantic-release@beta
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Build Expo
+      #   run: HOME=/root bluebase expo:build
+
+      # - name: Build Web
+      #   run: expo build:web
+
+      # - name: Move Build
+      #   run: mkdir --parents ./build/web/client; mv -v ./web-build/* ./build/web/client
+
+      # - name: Now Deploy
+      #   uses: BlueBaseJS/now-deploy-github-action@master
+      #   with:
+      #     configs: '{ "teamId":"team_jx3GHNNxYWDffKwJNB7oMHCS", "routes":[{"src":"/([^/.*]*)","dest":"index.html"}]}'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     NOW_TOKEN: ${{ secrets.ZEIT_TOKEN }}
+
+      # - name: Increase Watchers
+      #   run: echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+
+      # - name: Expo Deploy
+      #   uses: BlueBaseJS/expo-deploy-github-action@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     EXPO_CLI_USERNAME: ${{ secrets.EXPO_CLI_USERNAME }}
+      #     EXPO_CLI_PASSWORD: ${{ secrets.EXPO_CLI_PASSWORD }}
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.semantic_release.outputs.upload_url }}
+          asset_path: "test.txt"
+          asset_name: text.txt
+          asset_content_type: application/txt
