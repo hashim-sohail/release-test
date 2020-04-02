@@ -25,6 +25,7 @@ jobs:
         run: npx semantic-release@beta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # - name: Build Expo
       #   run: HOME=/root bluebase expo:build
