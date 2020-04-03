@@ -28,7 +28,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: kuchbe
-        run: echo ${steps.semantic_release}
+        env:
+          SOutput: ${{ steps.semantic_release }}
+        run: echo ${SOutput}
 
       - name: Upload Release Asset
         id: upload-release-asset
