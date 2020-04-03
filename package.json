@@ -1,5 +1,5 @@
 {
-  "name": "@hashim/release-for-test",
+  "name": "testing-release-with-assets",
   "version": "1.0.3",
   "description": "",
   "main": "index.js",
