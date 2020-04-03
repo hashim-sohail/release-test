@@ -18,7 +18,6 @@ async function listWorkflows(repo) {
         headers
       }
     );
-    console.log("data", data);
     return data;
   } catch (e) {
     console.log(e.response.data);
@@ -29,18 +28,16 @@ async function listWorkFlowRuns(repo, workflow_id) {
   console.log(
     `${GITHUB_API}/repos/${OWNER}/${repo}/actions/${workflow_id}/runs`
   );
-
   try {
     const { data } = await axios.get(
-      `${GITHUB_API}/repos/${OWNER}/${repo}/actions/${workflow_id}/runs`,
+      `${GITHUB_API}/repos/${OWNER}/${repo}/actions/workflows/${workflow_id}/runs?status=in_progress`,
       {
         headers
       }
     );
-    console.log("data", data);
     return data;
   } catch (e) {
-    console.log(e.response.data);
+    console.log("workflow run error", e.response.data);
   }
 }
 
@@ -49,11 +46,19 @@ const initiateKill = async (req, res) => {
   try {
     const workflows = await listWorkflows(REPO);
     for (let workflow of workflows.workflows) {
-      console.log("calling workflow", workflow.id);
-
       try {
-        const run = await listWorkFlowRuns(REPO, workflow.id);
-        console.log(run);
+        const runs = await listWorkFlowRuns(REPO, workflow.id);
+        console.log(runs);
+        if (runs.total_count === 1) {
+          return;
+        }
+
+        for (let index in runs.workflow_runs) {
+          if (index != 0) {
+            console.log("0 nai hai");
+          }
+          console.log(run);
+        }
       } catch (e) {}
     }
   } catch (e) {}
@@ -69,7 +74,7 @@ app.use(bodyParser.json());
 app.get("/killWorkflows", function(req, res) {
   console.log("query", req.query);
   initiateKill(req, res);
-  res.ok();
+  res.sendStatus(200);
 });
 
 app.listen(3000, function() {

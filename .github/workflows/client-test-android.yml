@@ -18,11 +18,10 @@ jobs:
         node-version: [12]
 
     steps:
+      - uses: rokroskar/workflow-run-cleanup-action
+        env:
+          GITHUB_TOKEN: ${{ secret.GITHUB_TOKEN }}
+
       - uses: actions/checkout@v1
 
-      - name: Semantic Release
-        id: semantic_release
-        run: npx semantic-release@beta
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: yarn add @bluebase/cli
